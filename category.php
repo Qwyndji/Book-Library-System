@@ -1,3 +1,18 @@
+<?php
+session_start(); // WAJIB untuk akses $_SESSION
+include '../config.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../auth/login.php");
+    exit;
+}
+
+$role_id = $_SESSION['role_id'] ?? null;
+
+$sql = "SELECT * FROM categories ORDER BY id ASC";
+$result = $conn->query($sql);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,43 +36,38 @@
                         data-lucide="x" class="h-5 w-5"></i> </button>
             </div>
             <nav class="px-3 py-4">
-                <div class="mb-4 px-4 text-xs font-semibold text-gray-500 uppercase">
-                    Main
-                </div>
+                <div class="mb-4 px-4 text-xs font-semibold text-gray-500 uppercase">Main</div>
                 <ul>
-                    <!-- <li class="mb-2">
-                        <a href="/dashboard/index.php"
-                            class="w-full flex items-center gap-2 px-4 py-2.5 rounded-md hover:bg-gray-100 bg-indigo-100 text-indigo-700">
-                            <i data-lucide="layout-dashboard" class="h-5 w-5"></i>
-                            <span class="font-medium">Dashboard</span>
-                        </a>
-                    </li> -->
+                    <?php if ($role_id != 2): ?>
                     <li class="mb-2">
                         <a href="http://localhost/booklibrary/dashboard/book.php"
-                            class="w-full flex items-center gap-2 px-4 py-2.5 rounded-md hover:bg-gray-100 bg-indigo-100 text-indigo-700">
+                            class="w-full flex items-center gap-2 px-4 py-2.5 rounded-md hover:bg-gray-100">
                             <i data-lucide="book" class="h-5 w-5"></i> <span class="font-medium">Book</span>
                         </a>
                     </li>
+                    <?php endif; ?>
+
                     <li class="mb-2">
                         <a href="http://localhost/booklibrary/dashboard/rent.php"
                             class="w-full flex items-center gap-2 px-4 py-2.5 rounded-md hover:bg-gray-100">
                             <i data-lucide="timer" class="h-5 w-5"></i> <span class="font-medium">Rent</span>
                         </a>
                     </li>
+
+                    <?php if ($role_id != 2): ?>
                     <li class="mb-2">
                         <a href="http://localhost/booklibrary/dashboard/report.php"
                             class="w-full flex items-center gap-2 px-4 py-2.5 rounded-md hover:bg-gray-100 ">
                             <i data-lucide="list-checks" class="h-5 w-5"></i> <span class="font-medium">Report</span>
-                            <!-- <i data-lucide="chevron-right" class="ml-auto h-4 w-4"></i> -->
                         </a>
                     </li>
                     <li class="mb-2">
                         <a href="http://localhost/booklibrary/dashboard/category.php"
-                            class="w-full flex items-center gap-2 px-4 py-2.5 rounded-md hover:bg-gray-100 ">
+                            class="w-full flex items-center gap-2 px-4 py-2.5 rounded-md hover:bg-gray-100 bg-indigo-100 text-indigo-700">
                             <i data-lucide="layout-list" class="h-5 w-5"></i> <span class="font-medium">Category</span>
-                            <!-- <i data-lucide="chevron-right" class="ml-auto h-4 w-4"></i> -->
                         </a>
                     </li>
+                    <?php endif; ?>
                     <li class="mb-2">
                         <a href="http://localhost/booklibrary/index.php"
                             class="w-full flex items-center gap-2 px-4 py-2.5 rounded-md hover:bg-gray-100 ">
@@ -65,7 +75,8 @@
                         </a>
                     </li>
                 </ul>
-                <div class="mt-8 mb-4 px-4 text-xs font-semibold text-gray-500 uppercase"> Settings </div>
+
+                <div class="mt-8 mb-4 px-4 text-xs font-semibold text-gray-500 uppercase">Settings</div>
                 <ul>
                     <li class="mb-2">
                         <a href="http://localhost/booklibrary/auth/logout.php"
@@ -97,7 +108,8 @@
                     <div class="relative"> <button onclick="toggleUserMenu()"
                             class="flex items-center gap-2 p-1 rounded-md hover:bg-gray-100 ">
                             <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center"> <i
-                                    data-lucide="user" class="h-4 w-4 text-indigo-600 "></i> </div> <span
+                                    data-lucide="user" class="h-4 w-4 text-indigo-600 "></i> </div>
+                            <span
                                 class="hidden md:inline text-sm font-medium"><?php echo $_SESSION['user_name']; ?></span>
                         </button> </div>
                 </div>
@@ -121,7 +133,7 @@
                 <!-- Table View -->
                 <div class="space-y-6">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <h1 class="text-2xl font-bold">Dashboard</h1>
+                        <h1 class="text-2xl font-bold">List Category</h1>
                         <div class="flex gap-2">
                             <!-- <button
                                 class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border border-gray-200 hover:bg-gray-50 transition-colors duration-200">
@@ -139,9 +151,10 @@
                                     class="ml-1 hidden sm:inline">Export</span>
                             </button> -->
                             <button
-                                class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200">
-                                <a href="/dashboard/book/add.php" class="w-full">
-                                    <span>Add Book</span>
+                                class="inline-flex items-center justify-center text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200">
+                                <a href="http://localhost/booklibrary/dashboard/category/form.php"
+                                    class="w-full px-4 py-2">
+                                    <span>Add Category</span>
                                 </a>
                             </button>
                         </div>
@@ -162,69 +175,60 @@
                             <table class="w-full">
                                 <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
                                     <tr>
-                                        <!-- <th class="px-6 py-3 text-left">
-                                            <div class="flex items-center gap-1 cursor-pointer select-none">
-                                                <span>Image</span>
-                                                <i data-lucide="chevron-up" class="h-4 w-4"></i>
-                                            </div>
-                                        </th> -->
                                         <th class="px-6 py-3 text-left">
                                             <div class="flex items-center gap-1 cursor-pointer select-none">
-                                                <span>Title</span>
-                                                <!-- <i data-lucide="chevron-up" class="h-4 w-4"></i> -->
+                                                <span>No.</span>
                                             </div>
                                         </th>
-                                        <th class="px-6 py-3 text-left">
+                                        <th class="px-6 py-3 text-left w-1/2">
                                             <div class="flex items-center gap-1 cursor-pointer select-none">
-                                                <span>Author</span>
-                                                <!-- <i data-lucide="chevron-up" class="h-4 w-4"></i> -->
+                                                <span>Name</span>
                                             </div>
                                         </th>
-                                        <th class="px-6 py-3 text-left">
+                                        <th class="px-6 py-3 text-left w-1/2">
                                             <div class="flex items-center gap-1 cursor-pointer select-none">
-                                                <span>Stock</span>
-                                                <!-- <i data-lucide="chevron-up" class="h-4 w-4"></i> -->
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-3 text-left">
-                                            <div class="flex items-center gap-1 cursor-pointer select-none">
-                                                <span>Category</span>
-                                                <!-- <i data-lucide="chevron-up" class="h-4 w-4"></i> -->
+                                                <span>Description</span>
                                             </div>
                                         </th>
                                         <th class="px-6 py-3 text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 ">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="h-[100px] w-[100px] flex-shrink-0 mr-3">
-                                                <div
-                                                    class="h-[100px] w-[100px] bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-medium">
-                                                    <!-- ${user.name.charAt(0)} -->
-                                                </div>
-                                            </div>
-                                            <div class="text-sm font-medium">Name</div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Email</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Email</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 py-1 text-xs rounded-full ${statusColor}">
-                                            Status
-                                        </span>
-                                    </td>
-                                    <td
-                                        class="px-6 py-4 flex flex-col gap-4 justify-center whitespace-nowrap text-center">
-                                        <button
-                                            class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 transition-colors duration-200">
-                                            <span>Edit</span>
-                                        </button>
-                                        <button
-                                            class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-rose-600 hover:bg-rose-700 transition-colors duration-200">
-                                            <span>Delete</span>
-                                        </button>
-                                    </td>
+                                    <?php
+                                    if ($result->num_rows > 0) {
+                                        $no = 1;
+                                        while($row = $result->fetch_assoc()) {
+                                            echo"
+                                            <tr>
+                                                <td class='px-6 py-4 whitespace-nowrap text-sm text-center'>" . $no++ . ".</td>
+                                                <td class='px-6 py-4 whitespace-nowrap'>
+                                                    <div class='flex items-center'>
+                                                        <div class='text-sm font-medium'>" . $row["name"] . "</div>
+                                                    </div>
+                                                </td>
+                                                <td class='px-6 py-4 whitespace-nowrap text-sm'>" . $row["description"] . "</td>
+                                                <td
+                                                    class='px-6 py-4 flex flex-col gap-4 justify-center whitespace-nowrap text-center'>
+                                                    <button
+                                                        class='inline-flex items-center justify-center text-sm font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 transition-colors duration-200'>
+                                                        <a href='http://localhost/booklibrary/dashboard/category/form.php?id=" . $row["id"] . "' class='w-full px-4 py-2'>
+                                                            <span>Edit</span>
+                                                        </a>
+                                                    </button>
+                                                    <button
+                                                        class='inline-flex items-center justify-center text-sm font-medium rounded-md shadow-sm text-white bg-rose-600 hover:bg-rose-700 transition-colors duration-200'>
+                                                        <a href='http://localhost/booklibrary/dashboard/category/delete.php?id=" . $row["id"] . "' onclick=\"return confirm('Are you sure you want to delete this data?')\" class='w-full px-4 py-2'>
+                                                            <span>Delete</span>
+                                                        </a>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            "; }
+                                        } else {
+                                            echo "<tr><td class='px-6 py-4 whitespace-nowrap text-sm text-center'>No record found.</td></tr>";
+                                        }
+                                        $conn->close();
+                                    ?>
                                 </tbody>
                             </table>
                         </div>
